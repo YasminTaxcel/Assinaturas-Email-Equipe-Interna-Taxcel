@@ -278,16 +278,6 @@
         </div>
         <button class="photo-reset" id="photo-reset">Remover foto</button>
       </div>
-
-      <button class="btn-download" id="btn-download">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white"
-             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="7 10 12 15 17 10"/>
-          <line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
-        Baixar PNG
-      </button>
     </div>
   </div>
 
@@ -330,6 +320,16 @@
         Baixe o PNG → Gmail ou Outlook → Configurações de Assinatura → Inserir imagem.
         O arquivo tem fundo branco e é compatível com todos os clientes de email.
       </div>
+
+      <button class="btn-download" id="btn-download">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Baixar PNG
+      </button>
     </div>
   </div>
 
@@ -575,7 +575,7 @@ async function exportPNG() {
   // Theme colours
   const C_BG      = isDark ? '#0D1B4B' : '#ffffff';
   const C_BORDER  = isDark ? 'rgba(255,255,255,0.08)' : '#E2E8F0';
-  const C_NAME    = '#ffffff';
+  const C_NAME    = isDark ? '#ffffff' : '#1B3A6B';
   const C_ROLE    = isDark ? '#ffffff' : '#2563EB';
   const C_TEXT    = isDark ? 'rgba(255,255,255,0.82)' : '#475569';
   const C_SEP_CLR = isDark ? 'rgba(255,255,255,0.15)' : '#E2E8F0';
