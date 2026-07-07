@@ -241,8 +241,12 @@
         <input type="email" id="f-email" placeholder="ana.rodrigues@taxcel.com.br" maxlength="80" autocomplete="email">
       </div>
       <div class="field">
-        <label>Telefone / WhatsApp</label>
-        <input type="tel" id="f-phone" value="1150394214" maxlength="25">
+        <label>Telefone</label>
+        <input type="tel" id="f-phone" placeholder="+55 11 99999-9999" maxlength="25">
+      </div>
+      <div class="field">
+        <label>WhatsApp</label>
+        <input type="tel" id="f-whatsapp" placeholder="+55 11 98888-8888" maxlength="25">
       </div>
       <div class="field">
         <label>Endereço</label>
@@ -383,24 +387,26 @@ const $ = id => document.getElementById(id);
 const fld = key => fields[key].value.trim();
 
 const fields = {
-  name:     $('f-name'),
-  role:     $('f-role'),
-  email:    $('f-email'),
-  phone:    $('f-phone'),
-  address:  $('f-address'),
-  website:  $('f-website'),
-  linkedin: $('f-linkedin'),
+  name:      $('f-name'),
+  role:      $('f-role'),
+  email:     $('f-email'),
+  phone:     $('f-phone'),
+  whatsapp:  $('f-whatsapp'),
+  address:   $('f-address'),
+  website:   $('f-website'),
+  linkedin:  $('f-linkedin'),
 };
 
 // ── LIVE PREVIEW ─────────────────────────────────────────────────
 function renderPreview() {
-  const name     = fld('name');
-  const role     = fld('role');
-  const email    = fld('email');
-  const phone    = fld('phone');
-  const address  = fld('address');
-  const website  = fld('website');
-  const linkedin = fld('linkedin');
+  const name      = fld('name');
+  const role      = fld('role');
+  const email     = fld('email');
+  const phone     = fld('phone');
+  const whatsapp  = fld('whatsapp');
+  const address   = fld('address');
+  const website   = fld('website');
+  const linkedin  = fld('linkedin');
 
   $('sig-name').textContent = name || 'Nome Completo';
   $('sig-role').textContent = role || 'Cargo / Função';
@@ -415,11 +421,16 @@ function renderPreview() {
 
   const ico = b64 => `<img class="c-icon" src="${dataUrl(b64)}" alt="">`;
 
-  // Row 1: [email icon] email · [WA icon] phone
+  const contactItems = [];
+  if (email) contactItems.push(`${ico(ICO_EMAIL)}<span style="margin-left:2px">${email}</span>`);
+  if (phone) contactItems.push(`${ico(ICO_WA)}<span style="margin-left:2px">Tel: ${phone}</span>`);
+  if (whatsapp) contactItems.push(`${ico(ICO_WA)}<span style="margin-left:2px">WhatsApp: ${whatsapp}</span>`);
+
   let r1 = '';
-  if (email) r1 += `${ico(ICO_EMAIL)}<span style="margin-left:2px">${email}</span>`;
-  if (email && phone) r1 += '<span class="sep">·</span>';
-  if (phone) r1 += `${ico(ICO_WA)}<span style="margin-left:2px">${phone}</span>`;
+  contactItems.forEach((item, index) => {
+    if (index > 0) r1 += '<span class="sep">·</span>';
+    r1 += item;
+  });
 
   // Row 2: [addr] address (linha inteira)
   let r2 = '';
@@ -556,13 +567,14 @@ async function exportPNG() {
     loadImage(dataUrl(ICO_LI)),
   ]);
 
-  const name     = fld('name')    || 'Nome Completo';
-  const role     = fld('role')    || 'Cargo';
-  const email    = fld('email');
-  const phone    = fld('phone');
-  const address  = fld('address');
-  const website  = fld('website');
-  const linkedin = fld('linkedin');
+  const name      = fld('name')    || 'Nome Completo';
+  const role      = fld('role')    || 'Cargo';
+  const email     = fld('email');
+  const phone     = fld('phone');
+  const whatsapp  = fld('whatsapp');
+  const address   = fld('address');
+  const website   = fld('website');
+  const linkedin  = fld('linkedin');
 
   const PD  = 86;
   const PX  = 20;
@@ -667,28 +679,28 @@ async function exportPNG() {
     }
   }
 
-  // Row 1: [email] email · [WA] phone
+  // Row 1: email · telefone · whatsapp
   let cx = TX;
   const ry1 = 95;
   ctx.fillStyle = C_TEXT;
-  if (email) {
-    drawIcon(imgEmailIco, cx, ry1);
+  const contactItems = [];
+  if (email) contactItems.push({ icon: imgEmailIco, text: email, maxW: 160 });
+  if (phone) contactItems.push({ icon: imgWa, text: `Tel: ${phone}`, maxW: 104 });
+  if (whatsapp) contactItems.push({ icon: imgWa, text: `WhatsApp: ${whatsapp}`, maxW: 124 });
+
+  contactItems.forEach((item, index) => {
+    if (index > 0) {
+      ctx.fillStyle = C_DOT;
+      ctx.fillText('  ·  ', cx, ry1);
+      cx += ctx.measureText('  ·  ').width;
+      ctx.fillStyle = C_TEXT;
+    }
+    drawIcon(item.icon, cx, ry1);
     cx += ICO + 3;
-    const et = truncate(ctx, email, 160);
-    ctx.fillText(et, cx, ry1);
-    cx += ctx.measureText(et).width;
-  }
-  if (email && phone) {
-    ctx.fillStyle = C_DOT;
-    ctx.fillText('  ·  ', cx, ry1);
-    cx += ctx.measureText('  ·  ').width;
-    ctx.fillStyle = C_TEXT;
-  }
-  if (phone) {
-    drawIcon(imgWa, cx, ry1);
-    cx += ICO + 3;
-    ctx.fillText(truncate(ctx, phone, 110), cx, ry1);
-  }
+    const label = truncate(ctx, item.text, item.maxW);
+    ctx.fillText(label, cx, ry1);
+    cx += ctx.measureText(label).width;
+  });
 
   // Row 2: [addr] address — linha inteira
   const ry2 = 109;
